@@ -4,7 +4,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 kube_version=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)
 curl -LO https://storage.googleapis.com/kubernetes-release/release/${kube_version}/bin/linux/amd64/kubectl && \
-    chmod +x kubectl && sudo mv kubectl /usr/local/bin/
+    chmod +x kubectl && mv kubectl /usr/local/bin/
 echo "Installed kubectl CLI tool"
 echo "Installing nsenter"
 if ! which nsenter > /dev/null; then
@@ -15,7 +15,7 @@ if ! which nsenter > /dev/null; then
   cd util-linux-2.31
   ./configure --without-ncurses
   make nsenter
-  sudo cp nsenter /usr/local/bin
+  cp nsenter /usr/local/bin
   rm -rf "${NSENTER_BUILD_DIR}"
   popd
 fi
@@ -34,19 +34,19 @@ if ! which systemd-run > /dev/null; then
     break
   done
   echo "remaining args: "$@
-  exec $@' | sudo tee /usr/bin/systemd-run >/dev/null
-  sudo chmod +x /usr/bin/systemd-run
+  exec $@' | tee /usr/bin/systemd-run >/dev/null
+  chmod +x /usr/bin/systemd-run
 fi
 oc_tool_version="openshift-origin-client-tools-v3.10.0-dd10d17-linux-64bit"
 curl -LO https://github.com/openshift/origin/releases/download/v3.10.0/${oc_tool_version}.tar.gz && \
-    tar -xvzf ${oc_tool_version}.tar.gz && chmod +x $PWD/${oc_tool_version}/oc && sudo mv $PWD/${oc_tool_version}/oc /usr/local/bin/ && \
+    tar -xvzf ${oc_tool_version}.tar.gz && chmod +x $PWD/${oc_tool_version}/oc && mv $PWD/${oc_tool_version}/oc /usr/local/bin/ && \
     rm -rf ${oc_tool_version}.tar.gz
 echo "Installed OC CLI tool"
 tmp=`mktemp`
 echo 'DOCKER_OPTS="$DOCKER_OPTS --insecure-registry 172.30.0.0/16"' > ${tmp}
-sudo mv ${tmp} /etc/default/docker
-sudo mount --make-shared /
-sudo service docker restart
+mv ${tmp} /etc/default/docker
+mount --make-shared /
+service docker restart
 echo "Configured Docker daemon with insecure-registry"
 oc cluster up
 sleep 10
